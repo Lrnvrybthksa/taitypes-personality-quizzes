@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaiTypes — The PASE Compass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#12151C;
+    --paper-dim:#1B2029;
+    --ink:#EDEAE2;
+    --ink-soft:#8B93A1;
+    --line:rgba(255,255,255,0.10);
+    --practical:#7C9BD6;
+    --practical-soft:rgba(124,155,214,0.16);
+    --action:#C24E5E;
+    --action-soft:rgba(194,78,94,0.16);
+    --social:#D9AE55;
+    --social-soft:rgba(217,174,85,0.16);
+    --emotional:#B285B6;
+    --emotional-soft:rgba(178,133,182,0.16);
+    --radius-lg: 22px;
+    --radius-md: 14px;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -12px rgba(0,0,0,0.55);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(124,155,214,0.08) 0%, transparent 60%),
+      radial-gradient(900px 500px at 90% 110%, rgba(178,133,182,0.06) 0%, transparent 60%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .bg-lines{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image: repeating-linear-gradient(180deg, transparent 0 39px, var(--line) 39px 40px);
+    -webkit-mask-image: linear-gradient(180deg, transparent, black 8%, black 92%, transparent);
+    mask-image: linear-gradient(180deg, transparent, black 8%, black 92%, transparent);
+    opacity:0.35;
+  }
+
+  .shell{
+    position:relative; z-index:1;
+    max-width:640px;
+    margin:0 auto;
+    padding:28px 20px 80px;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ---------- Header ---------- */
+  header.top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding-bottom:22px; margin-bottom:6px;
+    border-bottom:1px solid var(--line);
+    gap:14px;
+  }
+  .header-left{ display:flex; align-items:center; gap:12px; }
+  .menu-btn{
+    appearance:none; background:transparent; border:1px solid var(--line); border-radius:10px;
+    width:36px; height:36px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; flex-shrink:0; transition:border-color 0.15s ease, background 0.15s ease;
+  }
+  .menu-btn:hover{ border-color:var(--ink-soft); background:var(--paper-dim); }
+  .menu-btn svg{ width:16px; height:16px; }
+  .menu-btn span{ display:block; height:1.5px; width:16px; background:var(--ink); border-radius:2px; }
+  .menu-btn .bars{ display:flex; flex-direction:column; gap:3.5px; }
+  .wordmark{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:22px;
+    letter-spacing:-0.01em;
+  }
+  .wordmark span{ color:var(--action); font-style:italic; font-weight:500;}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+
+  /* ---------- Screens ---------- */
+  .screen{ display:none; flex:1; flex-direction:column; }
+  .screen.active{ display:flex; animation:fadeUp 0.5s ease both; }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ---------- Landing ---------- */
+  #screen-landing{ justify-content:center; text-align:left; padding-top:20px;}
+  .kicker{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--action); margin-bottom:14px;
+  }
+  h1.hero{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(34px, 8vw, 52px);
+    line-height:1.04;
+    letter-spacing:-0.015em;
+    margin:0 0 18px;
+  }
+  h1.hero em{ font-style:italic; font-weight:500; color:var(--action); }
+  .lede{ font-size:16.5px; line-height:1.6; color:var(--ink-soft); max-width:52ch; margin:0 0 28px;}
+
+  .letter-row{ display:flex; gap:10px; margin-bottom:30px; flex-wrap:wrap; }
+  .letter-chip{
+    display:flex; align-items:center; gap:8px;
+    background:var(--paper-dim); border:1px solid var(--line);
+    border-radius:999px; padding:7px 14px 7px 8px;
+    font-size:13px; font-weight:500;
+  }
+  .letter-chip .dot{ width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:600; color:#12151C; flex-shrink:0;}
+  .dot.P{ background:var(--practical);} .dot.A{ background:var(--action);}
+  .dot.S{ background:var(--social);} .dot.E{ background:var(--emotional);}
+
+  .btn{
+    appearance:none; border:none; cursor:pointer;
+    font-family:'IBM Plex Sans', sans-serif; font-weight:600; font-size:15px;
+    border-radius:999px; padding:14px 26px;
+    display:inline-flex; align-items:center; gap:10px;
+    transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  }
+  .btn-primary{ background:var(--ink); color:var(--paper); box-shadow:var(--shadow); }
+  .btn-primary:hover{ transform:translateY(-1px); }
+  .btn-primary:active{ transform:translateY(0px); }
+  .btn-ghost{ background:transparent; color:var(--ink); border:1px solid var(--line); }
+  .btn-ghost:hover{ background:var(--paper-dim); }
+  .btn:disabled{ opacity:0.35; cursor:not-allowed; transform:none; }
+
+  .meta-row{ display:flex; gap:22px; margin-top:26px; font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); }
+  .meta-row b{ color:var(--ink); }
+
+  /* ---------- Compass (shared signature element) ---------- */
+  .compass-wrap{ display:flex; justify-content:center; margin: 6px 0 8px;}
+  svg.compass text{ font-family:'IBM Plex Mono', monospace; }
+
+  /* ---------- Quiz ---------- */
+  .quiz-progress-row{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    margin: 18px 0 8px;
+  }
+  .ring{ position:relative; width:46px; height:46px; flex-shrink:0; }
+  .ring svg{ transform:rotate(-90deg); }
+  .ring .track{ fill:none; stroke:var(--line); stroke-width:4; }
+  .ring .fill{ fill:none; stroke:var(--ink); stroke-width:4; stroke-linecap:round; transition:stroke-dashoffset 0.4s ease; }
+  .qcount{ font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--ink-soft); }
+  .qcount b{ color:var(--ink); font-weight:600; }
+
+  .bar-track{ height:3px; background:var(--line); border-radius:3px; overflow:hidden; margin-bottom:36px; }
+  .bar-fill{ height:100%; background:linear-gradient(90deg, var(--practical), var(--action), var(--social), var(--emotional)); transition:width 0.4s ease; width:0%;}
+
+  .qnum{ font-family:'IBM Plex Mono', monospace; color:var(--action); font-size:13px; margin-bottom:10px; }
+  h2.question{
+    font-family:'Fraunces', serif; font-weight:500; font-size:clamp(24px,5.4vw,30px);
+    line-height:1.2; letter-spacing:-0.01em; margin:0 0 28px;
+  }
+
+  .options{ display:flex; flex-direction:column; gap:10px; margin-bottom:30px; }
+  .opt{
+    text-align:left;
+    background:var(--paper-dim); border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:16px 18px; font-size:15px; line-height:1.4; color:var(--ink);
+    cursor:pointer; display:flex; align-items:center; gap:14px;
+    transition:border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  }
+  .opt:hover{ border-color:var(--ink); }
+  .opt:active{ transform:scale(0.99); }
+  .opt .marker{ width:9px; height:9px; border-radius:50%; border:1.5px solid var(--ink-soft); flex-shrink:0; transition:all 0.15s ease;}
+  .opt.selected{ background:var(--paper-dim); border-color:var(--ink); }
+  .opt.selected .marker{ background:var(--ink); border-color:var(--ink); }
+
+  .nav-row{ display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:8px;}
+
+  /* ---------- Results ---------- */
+  .results-head{ text-align:center; margin-bottom:6px; }
+  .results-kicker{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); }
+  h1.archetype{
+    font-family:'Fraunces', serif; font-weight:600; font-size:clamp(30px,7vw,42px);
+    text-align:center; margin:6px 0 4px; letter-spacing:-0.01em;
+  }
+  .archetype-sub{ text-align:center; color:var(--ink-soft); font-size:15px; margin-bottom:6px;}
+  .archetype-desc{
+    max-width:52ch; margin:18px auto 8px; text-align:center; font-size:16px; line-height:1.65; color:var(--ink);
+  }
+  .archetype-note{
+    max-width:52ch; margin:0 auto 30px; text-align:center; font-size:13.5px; line-height:1.6; color:var(--ink-soft);
+    background:var(--paper-dim); border:1px solid var(--line); border-radius:var(--radius-md); padding:14px 18px;
+  }
+  .archetype-note b{ color:var(--ink); }
+
+  .stat-list{ display:flex; flex-direction:column; gap:16px; margin: 8px 0 34px; }
+  .stat-row{ display:flex; align-items:center; gap:14px; }
+  .stat-label{ width:96px; flex-shrink:0; font-size:13.5px; font-weight:600; display:flex; align-items:center; gap:8px;}
+  .stat-track{ flex:1; height:10px; background:var(--paper-dim); border-radius:6px; overflow:hidden; border:1px solid var(--line);}
+  .stat-fill{ height:100%; border-radius:6px; transition:width 0.8s cubic-bezier(.2,.8,.2,1); width:0%;}
+  .stat-fill.P{ background:var(--practical);} .stat-fill.A{ background:var(--action);}
+  .stat-fill.S{ background:var(--social);} .stat-fill.E{ background:var(--emotional);}
+  .stat-pct{ width:46px; text-align:right; font-family:'IBM Plex Mono', monospace; font-size:13.5px; font-weight:600; flex-shrink:0;}
+  .stat-rank{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft); width:16px;}
+
+  .section-title{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--ink-soft); margin: 0 0 14px; text-align:center;
+  }
+
+  .divider{ height:1px; background:var(--line); margin:34px 0; }
+
+  .combo-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:30px; }
+  .combo-card{ background:var(--paper-dim); border:1px solid var(--line); border-radius:var(--radius-md); padding:14px; text-align:center; }
+  .combo-card .val{ font-family:'IBM Plex Mono', monospace; font-size:20px; font-weight:600; }
+  .combo-card .lab{ font-size:11.5px; color:var(--ink-soft); margin-top:2px;}
+
+  .actions-row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:6px; }
+
+  .next-quiz-card{
+    margin-top:44px; border:1px dashed var(--line); border-radius:var(--radius-lg);
+    padding:22px; text-align:center; background:var(--paper-dim);
+  }
+  .next-quiz-card .tag{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.08em;}
+  .next-quiz-card h3{ font-family:'Fraunces', serif; font-weight:600; font-size:20px; margin:8px 0 6px;}
+  .next-quiz-card p{ font-size:13.5px; color:var(--ink-soft); margin:0; max-width:40ch; margin:0 auto;}
+
+  footer{ text-align:center; margin-top:50px; font-size:12px; color:var(--ink-soft); font-family:'IBM Plex Mono', monospace;}
+
+  @media (max-width:420px){
+    .stat-label{ width:76px; font-size:12.5px;}
+    .combo-grid{ grid-template-columns:1fr 1fr; }
+  }
+
+  :focus-visible{ outline:2px solid var(--action); outline-offset:2px; }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
+  }
+
+  /* ---------- About / Archetypes pages ---------- */
+  .back-link{
+    appearance:none; background:transparent; border:none; cursor:pointer;
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--ink-soft);
+    padding:0; margin: 4px 0 18px; display:inline-flex; align-items:center; transition:color 0.15s ease;
+  }
+  .back-link:hover{ color:var(--ink); }
+
+  .page-title{
+    font-family:'Fraunces', serif; font-weight:600; font-size:clamp(28px,6.5vw,38px);
+    line-height:1.08; letter-spacing:-0.015em; margin:4px 0 18px;
+  }
+  .body-copy{ font-size:15.5px; line-height:1.65; color:var(--ink-soft); margin:0 0 26px; max-width:58ch; }
+  .body-copy b{ color:var(--ink); }
+
+  .about-block{ display:flex; gap:16px; padding:20px 0; border-top:1px solid var(--line); }
+  .about-block:last-of-type{ border-bottom:1px solid var(--line); }
+  .about-num{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--action); flex-shrink:0; width:26px; padding-top:2px;}
+  .about-block h3{ font-family:'Fraunces', serif; font-weight:600; font-size:17px; margin:0 0 6px; }
+  .about-block p{ font-size:14.5px; line-height:1.6; color:var(--ink-soft); margin:0; }
+  .about-block p b{ color:var(--ink); }
+
+  .archetype-list{ display:flex; flex-direction:column; gap:12px; margin-top:8px; padding-bottom:20px; }
+  .archetype-card{
+    background:var(--paper-dim); border:1px solid var(--line); border-radius:var(--radius-lg);
+    padding:20px 22px; display:flex; gap:16px; align-items:flex-start;
+  }
+  .archetype-card .badge{
+    width:44px; height:44px; border-radius:12px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:600; color:#12151C;
+  }
+  .archetype-card h3{ font-family:'Fraunces', serif; font-weight:600; font-size:19px; margin:0 0 2px; }
+  .archetype-card .arche-sub{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:8px; }
+  .archetype-card p{ font-size:14px; line-height:1.6; color:var(--ink-soft); margin:0; }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.55);
+    opacity:0; pointer-events:none; transition:opacity 0.25s ease; z-index:40;
+  }
+  .sidebar-overlay.open{ opacity:1; pointer-events:auto; }
+
+  .sidebar{
+    position:fixed; top:0; left:0; bottom:0; width:290px; max-width:84vw;
+    background:var(--paper-dim); border-right:1px solid var(--line);
+    z-index:50; transform:translateX(-100%); transition:transform 0.3s cubic-bezier(.2,.8,.2,1);
+    display:flex; flex-direction:column; padding:22px 18px;
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+  }
+  .sidebar.open{ transform:translateX(0); }
+
+  .sidebar-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:26px; }
+  .sidebar-wordmark{ font-family:'Fraunces', serif; font-weight:600; font-size:19px; }
+  .sidebar-wordmark span{ color:var(--action); font-style:italic; font-weight:500; }
+  .sidebar-close{
+    appearance:none; background:transparent; border:1px solid var(--line); border-radius:10px;
+    width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:var(--ink-soft); font-size:16px; line-height:1; transition:border-color 0.15s ease;
+  }
+  .sidebar-close:hover{ border-color:var(--ink-soft); color:var(--ink); }
+
+  .sidebar-section-label{
+    font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--ink-soft); margin: 4px 0 12px;
+  }
+
+  .sidebar-list{ display:flex; flex-direction:column; gap:8px; }
+  .sidebar-item{
+    display:flex; align-items:center; gap:12px;
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:13px 14px; text-align:left; cursor:pointer; width:100%;
+    font-family:'IBM Plex Sans', sans-serif; color:var(--ink);
+    transition:border-color 0.15s ease, background 0.15s ease;
+  }
+  .sidebar-item:not(.locked):hover{ border-color:var(--ink-soft); }
+  .sidebar-item.active{ border-color:var(--action); background:var(--action-soft); }
+  .sidebar-item.locked{ cursor:default; opacity:0.55; }
+
+  .sidebar-item-icon{
+    width:32px; height:32px; border-radius:9px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:600;
+  }
+  .sidebar-item.active .sidebar-item-icon{ background:var(--action); color:#12151C; }
+  .sidebar-item.locked .sidebar-item-icon{ background:var(--paper-dim); border:1px solid var(--line); color:var(--ink-soft); }
+
+  .sidebar-item-body{ flex:1; min-width:0; }
+  .sidebar-item-title{ font-size:13.5px; font-weight:600; line-height:1.3; }
+  .sidebar-item-sub{ font-size:11.5px; color:var(--ink-soft); margin-top:2px; }
+  .sidebar-item-tag{
+    font-family:'IBM Plex Mono', monospace; font-size:9.5px; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--ink-soft); border:1px solid var(--line); border-radius:999px; padding:3px 8px; flex-shrink:0;
+  }
+  .sidebar-item.active .sidebar-item-tag{ color:var(--action); border-color:var(--action); }
+
+  .sidebar-foot{ margin-top:auto; padding-top:18px; border-top:1px solid var(--line); }
+  .sidebar-foot p{ font-size:11.5px; color:var(--ink-soft); line-height:1.5; margin:0; }
+</style>
+</head>
+<body>
+<div class="bg-lines"></div>
+
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <div class="sidebar-wordmark">Tai<span>Types</span></div>
+    <button class="sidebar-close" id="sidebar-close" aria-label="Close menu">✕</button>
+  </div>
+
+  <div class="sidebar-section-label">Quizzes</div>
+  <div class="sidebar-list">
+    <button class="sidebar-item active" id="sidebar-item-pase">
+      <div class="sidebar-item-icon">01</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">The PASE Compass</div>
+        <div class="sidebar-item-sub">Practical · Action · Social · Emotional</div>
+      </div>
+      <div class="sidebar-item-tag">Live</div>
+    </button>
+
+    <button class="sidebar-item active" id="sidebar-item-brand">
+      <div class="sidebar-item-icon">02</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">What's Your Personal Brand?</div>
+        <div class="sidebar-item-sub">Expert · Entertainer · Connector · Maverick</div>
+      </div>
+      <div class="sidebar-item-tag">Live</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">03</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">The 4 Motivations</div>
+        <div class="sidebar-item-sub">What actually drives you</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">04</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">VRIN Score</div>
+        <div class="sidebar-item-sub">Not started yet</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">05</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">The Fulfillment Check</div>
+        <div class="sidebar-item-sub">Rate your Health, Wealth, Love &amp; Happiness</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">06</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">Find Your Flow</div>
+        <div class="sidebar-item-sub">How easily you drop into flow state</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">07</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">Regret Factor</div>
+        <div class="sidebar-item-sub">How much regret shapes your choices</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">08</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">Generalist or Specialist?</div>
+        <div class="sidebar-item-sub">Or a bit of both</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">09</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">Your Hormonal Type</div>
+        <div class="sidebar-item-sub">Dopamine · Serotonin · Oxytocin · Cortisol</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">10</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">Risk Factor</div>
+        <div class="sidebar-item-sub">How much risk you're really built for</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">11</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">Marriage Spectrum</div>
+        <div class="sidebar-item-sub">How you really feel about marriage</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">12</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">The Male Archetypes</div>
+        <div class="sidebar-item-sub">5 archetypes, how much of each you are</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">13</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">The Female Archetypes</div>
+        <div class="sidebar-item-sub">5 archetypes, how much of each you are</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">14</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">Public Speaking Score</div>
+        <div class="sidebar-item-sub">How strong your speaking skills are</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">15</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">Tech Skills Score</div>
+        <div class="sidebar-item-sub">How strong your tech skills are</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">16</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">Conscientiousness</div>
+        <div class="sidebar-item-sub">How organized &amp; disciplined you are</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">17</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">Openness to Experience</div>
+        <div class="sidebar-item-sub">How curious &amp; open you are to new things</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">18</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">Extraversion / Introversion</div>
+        <div class="sidebar-item-sub">Where you get your energy from</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+
+    <button class="sidebar-item locked" disabled>
+      <div class="sidebar-item-icon">19</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">Compatibility &amp; Mating Styles</div>
+        <div class="sidebar-item-sub">Still pretty vague — needs shape</div>
+      </div>
+      <div class="sidebar-item-tag">Soon</div>
+    </button>
+  </div>
+
+  <div class="sidebar-section-label" style="margin-top:22px;">Learn</div>
+  <div class="sidebar-list">
+    <button class="sidebar-item" id="sidebar-item-about">
+      <div class="sidebar-item-icon" style="background:var(--paper); border:1px solid var(--line);">?</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">Understanding Your Results</div>
+        <div class="sidebar-item-sub">How scoring &amp; archetypes work</div>
+      </div>
+    </button>
+
+    <button class="sidebar-item" id="sidebar-item-archetypes">
+      <div class="sidebar-item-icon" style="background:var(--paper); border:1px solid var(--line);">✦</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">PASE Archetypes</div>
+        <div class="sidebar-item-sub">Every PASE type, explained</div>
+      </div>
+    </button>
+
+    <button class="sidebar-item" id="sidebar-item-brand-archetypes">
+      <div class="sidebar-item-icon" style="background:var(--paper); border:1px solid var(--line);">✦</div>
+      <div class="sidebar-item-body">
+        <div class="sidebar-item-title">Personal Brand Archetypes</div>
+        <div class="sidebar-item-sub">Every brand type, explained</div>
+      </div>
+    </button>
+  </div>
+
+  <div class="sidebar-foot">
+    <p>More TaiTypes quizzes are built one at a time — this list grows as each one ships.</p>
+  </div>
+</aside>
+
+<div class="shell">
+
+  <header class="top">
+    <div class="header-left">
+      <button class="menu-btn" id="menu-btn" aria-label="Open menu">
+        <div class="bars"><span></span><span></span><span></span></div>
+      </button>
+      <div class="wordmark">Tai<span>Types</span></div>
+    </div>
+    <div class="eyebrow" id="header-tag">Quiz 01 · The PASE Compass</div>
+  </header>
+
+  <!-- LANDING -->
+  <section id="screen-landing" class="screen active">
+    <div class="kicker">A self-typing quiz</div>
+    <h1 class="hero">Which way do<br>you <em>lean</em>?</h1>
+    <p class="lede">The PASE system sorts how you naturally operate into four directions: <b>Practical</b>, <b>Action</b>, <b>Social</b>, and <b>Emotional</b>. Most people are a blend — this measures exactly how much of each, then plots your personal bearing.</p>
+
+    <div class="letter-row">
+      <div class="letter-chip"><span class="dot P">P</span>Practical</div>
+      <div class="letter-chip"><span class="dot A">A</span>Action</div>
+      <div class="letter-chip"><span class="dot S">S</span>Social</div>
+      <div class="letter-chip"><span class="dot E">E</span>Emotional</div>
+    </div>
+
+    <div class="compass-wrap" id="landing-compass"></div>
+
+    <div style="display:flex; justify-content:center; margin-top:10px;">
+      <button class="btn btn-primary" id="btn-start">Take the quiz →</button>
+    </div>
+    <div class="meta-row" style="justify-content:center;">
+      <span><b>30</b> questions</span>
+      <span><b>~5</b> minutes</span>
+      <span><b>4</b> directions, full % breakdown</span>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="screen-quiz" class="screen">
+    <div class="quiz-progress-row">
+      <div class="ring">
+        <svg viewBox="0 0 46 46">
+          <circle class="track" cx="23" cy="23" r="19"></circle>
+          <circle class="fill" id="ring-fill" cx="23" cy="23" r="19" stroke-dasharray="119.4" stroke-dashoffset="119.4"></circle>
+        </svg>
+      </div>
+      <div class="qcount"><b id="q-current">1</b> / 30</div>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
+
+    <div class="qnum" id="q-eyebrow">QUESTION 01</div>
+    <h2 class="question" id="q-text">—</h2>
+    <div class="options" id="q-options"></div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" id="btn-back">← Back</button>
+      <button class="btn btn-primary" id="btn-next" disabled>Next →</button>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="screen-results" class="screen">
+    <div class="results-head">
+      <div class="results-kicker">Your PASE bearing</div>
+    </div>
+    <h1 class="archetype" id="res-archetype">—</h1>
+    <p class="archetype-sub" id="res-archetype-sub">—</p>
+
+    <div class="compass-wrap" id="results-compass"></div>
+
+    <p class="archetype-desc" id="res-desc">—</p>
+    <div class="archetype-note" id="res-note"></div>
+
+    <div class="divider"></div>
+
+    <div class="section-title">Full breakdown</div>
+    <div class="stat-list" id="stat-list"></div>
+
+    <div class="combo-grid" id="combo-grid"></div>
+
+    <div class="actions-row">
+      <button class="btn btn-primary" id="btn-retake">Retake the quiz</button>
+      <button class="btn btn-ghost" id="btn-share">Copy my results</button>
+    </div>
+
+    <div class="next-quiz-card">
+      <div class="tag">Try next</div>
+      <h3>Quiz 02 · What's Your Personal Brand?</h3>
+      <p>Same idea, different lens — how you build authority, attention, and trust. Ready whenever you are.</p>
+      <button class="btn btn-primary" id="btn-goto-brand" style="margin-top:14px;">Take the brand quiz →</button>
+    </div>
+
+    <footer>TaiTypes · built for fun, not a licensed psychological instrument</footer>
+  </section>
+
+  <!-- ABOUT / UNDERSTANDING RESULTS -->
+  <section id="screen-about" class="screen">
+    <button class="back-link" id="about-back">← Back</button>
+    <div class="results-kicker" style="text-align:left;">Guide</div>
+    <h1 class="page-title">Understanding your results</h1>
+
+    <p class="body-copy">PASE breaks how you naturally operate into four directions: <b style="color:var(--practical)">Practical</b>, <b style="color:var(--action)">Action</b>, <b style="color:var(--social)">Social</b>, and <b style="color:var(--emotional)">Emotional</b>. Every question is a forced choice between the four — there's no "correct" option, just the one closest to how you'd actually respond.</p>
+
+    <div class="about-block">
+      <div class="about-num">01</div>
+      <div>
+        <h3>How the score works</h3>
+        <p>Across all 30 questions, we tally which type you picked each time. Your percentage for each type is just that count out of 30 — so all four always add up to 100%.</p>
+      </div>
+    </div>
+
+    <div class="about-block">
+      <div class="about-num">02</div>
+      <div>
+        <h3>How your archetype is picked</h3>
+        <p>We look at your ranked scores, highest to lowest. If one type clearly leads the pack, you get a <b>pure archetype</b> for that type. If your top two are close together and well ahead of the bottom two, you get a <b>combo archetype</b> built from that pair. If all four scores are close to each other, you land on <b>The All-Rounder</b> instead — no single lean dominates.</p>
+      </div>
+    </div>
+
+    <div class="about-block">
+      <div class="about-num">03</div>
+      <div>
+        <h3>What it isn't</h3>
+        <p>This is a for-fun self-typing tool inspired by the PASE framework, not a validated psychological instrument. Treat your result as a mirror to think with, not a label to live inside.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:center; margin-top:10px;">
+      <button class="btn btn-ghost" id="about-see-archetypes">See all archetypes →</button>
+    </div>
+  </section>
+
+  <!-- ARCHETYPE LIST -->
+  <section id="screen-archetypes" class="screen">
+    <button class="back-link" id="archetypes-back">← Back</button>
+    <div class="results-kicker" style="text-align:left;">Guide</div>
+    <h1 class="page-title">Every PASE archetype</h1>
+    <p class="body-copy">Four pure types, six two-way blends, and one balanced type — eleven possible results depending on how your 30 answers land.</p>
+
+    <div id="archetype-list" class="archetype-list"></div>
+  </section>
+
+  <!-- BRAND LANDING -->
+  <section id="screen-brand-landing" class="screen">
+    <div class="kicker">A self-typing quiz</div>
+    <h1 class="hero">What's your<br><em>personal brand</em>?</h1>
+    <p class="lede">Everyone builds a reputation, whether they mean to or not. This measures which lever you actually pull: <b>Expertise</b>, <b>Entertainment</b>, <b>Connection</b>, or <b>a bold point of view</b> — and how much of each shows up in how you present yourself.</p>
+
+    <div class="letter-row">
+      <div class="letter-chip"><span class="dot" style="background:var(--practical); color:#12151C;">EX</span>Expert</div>
+      <div class="letter-chip"><span class="dot" style="background:var(--action); color:#12151C;">EN</span>Entertainer</div>
+      <div class="letter-chip"><span class="dot" style="background:var(--social); color:#12151C;">CO</span>Connector</div>
+      <div class="letter-chip"><span class="dot" style="background:var(--emotional); color:#12151C;">MA</span>Maverick</div>
+    </div>
+
+    <div class="compass-wrap" id="brand-landing-compass"></div>
+
+    <div style="display:flex; justify-content:center; margin-top:10px;">
+      <button class="btn btn-primary" id="btn-brand-start">Take the quiz →</button>
+    </div>
+    <div class="meta-row" style="justify-content:center;">
+      <span><b>30</b> questions</span>
+      <span><b>~5</b> minutes</span>
+      <span><b>4</b> directions, full % breakdown</span>
+    </div>
+  </section>
+
+  <!-- BRAND QUIZ -->
+  <section id="screen-brand-quiz" class="screen">
+    <div class="quiz-progress-row">
+      <div class="ring">
+        <svg viewBox="0 0 46 46">
+          <circle class="track" cx="23" cy="23" r="19"></circle>
+          <circle class="fill" id="brand-ring-fill" cx="23" cy="23" r="19" stroke-dasharray="119.4" stroke-dashoffset="119.4"></circle>
+        </svg>
+      </div>
+      <div class="qcount"><b id="brand-q-current">1</b> / 30</div>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="brand-bar-fill"></div></div>
+
+    <div class="qnum" id="brand-q-eyebrow">QUESTION 01</div>
+    <h2 class="question" id="brand-q-text">—</h2>
+    <div class="options" id="brand-q-options"></div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost" id="brand-btn-back">← Back</button>
+      <button class="btn btn-primary" id="brand-btn-next" disabled>Next →</button>
+    </div>
+  </section>
+
+  <!-- BRAND RESULTS -->
+  <section id="screen-brand-results" class="screen">
+    <div class="results-head">
+      <div class="results-kicker">Your personal brand bearing</div>
+    </div>
+    <h1 class="archetype" id="brand-res-archetype">—</h1>
+    <p class="archetype-sub" id="brand-res-archetype-sub">—</p>
+
+    <div class="compass-wrap" id="brand-results-compass"></div>
+
+    <p class="archetype-desc" id="brand-res-desc">—</p>
+    <div class="archetype-note" id="brand-res-note"></div>
+
+    <div class="divider"></div>
+
+    <div class="section-title">Full breakdown</div>
+    <div class="stat-list" id="brand-stat-list"></div>
+
+    <div class="combo-grid" id="brand-combo-grid"></div>
+
+    <div class="actions-row">
+      <button class="btn btn-primary" id="brand-btn-retake">Retake the quiz</button>
+      <button class="btn btn-ghost" id="brand-btn-share">Copy my results</button>
+    </div>
+
+    <div class="next-quiz-card">
+      <div class="tag">Also live</div>
+      <h3>Quiz 01 · The PASE Compass</h3>
+      <p>Haven't taken the original yet? See how you operate day to day: Practical, Action, Social, or Emotional.</p>
+      <button class="btn btn-primary" id="btn-goto-pase" style="margin-top:14px;">Take the PASE quiz →</button>
+    </div>
+
+    <footer>TaiTypes · built for fun, not a licensed psychological instrument</footer>
+  </section>
+
+  <!-- BRAND ARCHETYPE LIST -->
+  <section id="screen-brand-archetypes" class="screen">
+    <button class="back-link" id="brand-archetypes-back">← Back</button>
+    <div class="results-kicker" style="text-align:left;">Guide</div>
+    <h1 class="page-title">Every personal brand archetype</h1>
+    <p class="body-copy">Four pure types, six two-way blends, and one balanced type — eleven possible results depending on how your 30 answers land.</p>
+
+    <div id="brand-archetype-list" class="archetype-list"></div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+
+  /* ---------------- DATA ---------------- */
+  const TYPES = ["P","A","S","E"];
+  const TYPE_NAME = {P:"Practical", A:"Action", S:"Social", E:"Emotional"};
+  const TYPE_COLOR = {P:"var(--practical)", A:"var(--action)", S:"var(--social)", E:"var(--emotional)"};
+  const TYPE_COLOR_HEX = {P:"#7C9BD6", A:"#C24E5E", S:"#D9AE55", E:"#B285B6"};
+
+  const QUESTIONS = [
+    {q:"Starting a new project at work", o:{P:"Map out a plan before doing anything", A:"Just start and figure it out as you go", S:"Loop in the team and talk through ideas", E:"Make sure everyone's comfortable with the direction first"}},
+    {q:"A free weekend, no plans yet", o:{P:"Research and plan something worthwhile", A:"Do something spontaneous, get moving", S:"Call up friends and hang out", E:"Recharge quietly, protect your energy"}},
+    {q:"Learning a brand new skill", o:{P:"Study the fundamentals first", A:"Dive in and learn by doing", S:"Learn alongside others, make it social", E:"Go slow so you don't feel overwhelmed"}},
+    {q:"Your group disagrees on how to proceed", o:{P:"Lay out the facts and let logic decide", A:"Push to just pick something and move", S:"Talk it out until everyone's heard", E:"Worry about who might feel dismissed"}},
+    {q:"Making a big purchase", o:{P:"Compare options and read every review", A:"Buy it once decided, no dragging feet", S:"Ask friends what they'd pick", E:"Sit with it until it feels right"}},
+    {q:"A friend seems upset near you", o:{P:"Ask what's wrong so you can help fix it", A:"Suggest doing something to take their mind off it", S:"Invite them to talk it out over coffee", E:"Immediately tune into how they're feeling"}},
+    {q:"An unexpected problem shows up", o:{P:"Break it down and solve it step by step", A:"Handle it now, sort details out later", S:"Ask around for how others handled it", E:"Check in on how it's affecting people first"}},
+    {q:"Giving a friend honest feedback", o:{P:"Give it straight, focused on what's true", A:"Keep it quick, point to what's next", S:"Bring it up casually in conversation", E:"Choose words carefully so it doesn't sting"}},
+    {q:"Planning a trip", o:{P:"Build a detailed itinerary in advance", A:"Book it, figure out details on the way", S:"Plan around who's coming and group fun", E:"Make sure the pace feels comfortable, not stressful"}},
+    {q:"Walking into a new job or school", o:{P:"Learn how things work before jumping in", A:"Get hands-on with tasks right away", S:"Introduce yourself and meet people", E:"Watch the room, get a feel for people first"}},
+    {q:"Receiving criticism", o:{P:"Evaluate if it's accurate, use what's useful", A:"Take it, adjust, move forward fast", S:"Talk it through with someone else", E:"Feel it first, need a moment before responding"}},
+    {q:"A friend cancels plans last minute", o:{P:"Ask why, note it, no big deal either way", A:"Shrug it off, go do something else", S:"Reschedule quickly, still want the hangout", E:"Wonder if you did something wrong"}},
+    {q:"Choosing where to eat with a group", o:{P:"Pick whatever's most efficient or cheapest", A:"Just choose something so you can go", S:"Let everyone weigh in, part of the fun", E:"Pick a place everyone will be happy with"}},
+    {q:"Working under a tight deadline", o:{P:"Prioritize and work through it methodically", A:"Power through, worry about polish later", S:"Rally the team, work through it together", E:"Manage your stress so it doesn't overwhelm you"}},
+    {q:"When you're bored", o:{P:"Find something productive to do", A:"Go do literally anything, movement helps", S:"Text someone, boredom means time to connect", E:"Sit with it, reflect on how you're feeling"}},
+    {q:"Facing a tough life decision", o:{P:"List pros and cons, decide with your head", A:"Trust your gut, decide and move on", S:"Talk it through with people you trust", E:"Consider how each option feels, not just looks"}},
+    {q:"Getting unexpected good news", o:{P:"Think through what it means practically", A:"Get moving on next steps immediately", S:"Call people up to share it", E:"Feel it fully before doing anything else"}},
+    {q:"Realizing you made a mistake", o:{P:"Figure out what went wrong and fix the process", A:"Fix it fast and move forward", S:"Talk about it with someone", E:"Feel bad about it, worry who it affected"}},
+    {q:"Starting a health or fitness goal", o:{P:"Build a structured, evidence-based plan", A:"Just start moving, adjust as you go", S:"Do it with a friend or group", E:"Go easy on yourself, avoid pressure"}},
+    {q:"Your plans suddenly change", o:{P:"Recalculate and re-plan quickly", A:"Roll with it, adapt on the fly", S:"Check what everyone else wants to do instead", E:"Feel a bit thrown off before adjusting"}},
+    {q:"Meeting new people at an event", o:{P:"Ask questions, learn what they do", A:"Jump into whatever's happening", S:"Work the room, easy to talk to anyone", E:"Ease in slowly, read the room first"}},
+    {q:"Someone asks what you think", o:{P:"Give an honest, reasoned opinion", A:"Give a quick, decisive answer", S:"Ask what others think too", E:"Consider how your answer will land"}},
+    {q:"Handling conflict directly", o:{P:"Focus on facts, not emotions", A:"Address it head-on, get it over with", S:"Talk it out, keep things friendly", E:"Avoid it if it means someone gets hurt"}},
+    {q:"Your ideal free evening", o:{P:"Working on a personal project", A:"Doing something active or new", S:"Out with friends", E:"Quiet time, processing the day"}},
+    {q:"Tackling a messy room or space", o:{P:"Make a system, organize methodically", A:"Just start and power through it", S:"Make it fun, do it with someone", E:"Deal with it when you're not stressed"}},
+    {q:"A coworker is struggling", o:{P:"Offer a practical fix or resource", A:"Jump in and help get it done", S:"Check in and chat about it", E:"Reassure them, make sure they feel okay"}},
+    {q:"Choosing a new hobby", o:{P:"Something that builds a useful skill", A:"Something physical or hands-on", S:"Something you can do with others", E:"Something calming and personal"}},
+    {q:"Getting a compliment", o:{P:"Thank them, note it, move on", A:"Brush it off, keep going", S:"Enjoy it, share the moment", E:"Feel genuinely touched by it"}},
+    {q:"Preparing for something nerve-wracking", o:{P:"Prepare thoroughly, know your material", A:"Just get through it, overthinking doesn't help", S:"Talk it through with someone first", E:"Manage the nerves, be gentle with yourself"}},
+    {q:"Your philosophy on getting things done", o:{P:"Plan well, execute with logic", A:"Action beats overthinking, every time", S:"Better together than alone", E:"Take care of people along the way"}}
+  ];
+
+  // deterministic shuffle per question so option order isn't always the same
+  function seededOrder(seed, types){
+    types = types || ["P","A","S","E"];
+    let x = seed * 2654435761 % 2147483647;
+    const arr = types.slice();
+    for(let i=arr.length-1;i>0;i--){
+      x = (x * 16807) % 2147483647;
+      const j = x % (i+1);
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    return arr;
+  }
+
+  const DECK = QUESTIONS.map((item, i) => ({
+    text: item.q,
+    options: seededOrder(i+7).map(t => ({type:t, text:item.o[t]}))
+  }));
+
+  const ARCHETYPES = {
+    P:  {name:"The Architect", sub:"Pure Practical", desc:"You lead with logic. Before you move, you want the plan, the facts, and the reasoning laid out — and you're happiest when a decision holds up under scrutiny.", note:"<b>Watch for:</b> analysis can outlast its usefulness. Sometimes the plan is good enough to act on already."},
+    A:  {name:"The Catalyst", sub:"Pure Action", desc:"You move first. Talking and planning are fine, but nothing beats getting your hands on the problem and learning by doing — momentum is your default state.", note:"<b>Watch for:</b> speed can outrun care. A beat of patience saves you from redoing work — or repairing feelings."},
+    S:  {name:"The Connector", sub:"Pure Social", desc:"You're energized by people. Conversation, group energy, and staying easygoing come naturally, and you'd usually rather work something out together than alone.", note:"<b>Watch for:</b> consensus-seeking can stall real decisions. Not everything needs the group's buy-in."},
+    E:  {name:"The Empath", sub:"Pure Emotional", desc:"You read the room before you read the situation. How people feel — including yourself — is the first thing you check, and you're careful not to cause hurt.", note:"<b>Watch for:</b> sensitivity can tip into avoidance. Some conversations need to happen even if they sting."},
+    PA: {name:"The Builder", sub:"Practical + Action", desc:"You plan just enough, then build. Logic gives you the blueprint and action gets it standing — you're most comfortable turning ideas into something real, fast.", note:"<b>Your edge:</b> you finish things. <b>Watch for:</b> the people side can get skipped when you're heads-down executing."},
+    PS: {name:"The Diplomat", sub:"Practical + Social", desc:"You bring the facts <em>and</em> the room along with you. You reason things through but you'd rather do it out loud, with others, landing on something the whole group can stand behind.", note:"<b>Your edge:</b> people trust your judgment. <b>Watch for:</b> too much discussion can delay a call only you need to make."},
+    PE: {name:"The Guardian", sub:"Practical + Emotional", desc:"You plan carefully and you plan for people. Every decision gets weighed twice — once for whether it works, once for who it affects.", note:"<b>Your edge:</b> thorough and considerate. <b>Watch for:</b> double-checking everything can slow you down more than it needs to."},
+    PA_alt: null,
+    AS: {name:"The Trailblazer", sub:"Action + Social", desc:"You move fast and you bring people with you. Sitting still and overthinking isn't your style — you'd rather rally the group and go figure it out together.", note:"<b>Your edge:</b> you generate momentum in others. <b>Watch for:</b> the group can move before the plan is actually solid."},
+    AE: {name:"The Firefighter", sub:"Action + Emotional", desc:"You act fast, especially when someone's hurting. Your instinct is protective — you notice distress quickly and you move to fix it before it's fully explained.", note:"<b>Your edge:</b> reliable in a crisis. <b>Watch for:</b> acting on a feeling before understanding the full situation."},
+    SE: {name:"The Nurturer", sub:"Social + Emotional", desc:"People and their feelings come first, always. You're the one who notices when someone's off, checks in, and makes sure the group feels good — not just functional.", note:"<b>Your edge:</b> people feel safe with you. <b>Watch for:</b> your own needs can quietly come last."},
+    BAL:{name:"The All-Rounder", sub:"Evenly Balanced", desc:"No single direction dominates — you shift style based on what the moment actually needs: logic here, action there, people skills when it counts, feeling things when it matters.", note:"<b>Your edge:</b> genuinely adaptable. <b>Watch for:</b> without a default mode, it can take you longer to know your own first move."}
+  };
+
+  const COMBO_KEYS = {
+    "P,A":"PA", "A,P":"PA",
+    "P,S":"PS", "S,P":"PS",
+    "P,E":"PE", "E,P":"PE",
+    "A,S":"AS", "S,A":"AS",
+    "A,E":"AE", "E,A":"AE",
+    "S,E":"SE", "E,S":"SE"
+  };
+
+  /* ---------------- PERSONAL BRAND QUIZ DATA ---------------- */
+  const BRAND_TYPES = ["EXP","ENT","CON","MAV"];
+  const BRAND_TYPE_NAME = {EXP:"Expert", ENT:"Entertainer", CON:"Connector", MAV:"Maverick"};
+  const BRAND_TYPE_COLOR_HEX = {EXP:"#7C9BD6", ENT:"#C24E5E", CON:"#D9AE55", MAV:"#B285B6"};
+  const BRAND_SHORT_LABELS = {EXP:"E", ENT:"N", CON:"C", MAV:"M"};
+
+  const BRAND_QUESTIONS = [
+    {q:"Starting a newsletter or blog", o:{EXP:"Share what you know — tips, breakdowns, how-tos", ENT:"Share your life and personality, make it fun to read", CON:"Interview interesting people and share their stories", MAV:"Say the things nobody else is willing to say"}},
+    {q:"Introducing yourself to a new group", o:{EXP:"Lead with what you do and what you're good at", ENT:"Crack a joke, make people laugh first", CON:"Ask questions, find out who everyone is", MAV:"Say something a little unexpected to stand out"}},
+    {q:"What you want people to say about you", o:{EXP:"\u201cThey really know their stuff\u201d", ENT:"\u201cThey're so much fun to be around\u201d", CON:"\u201cThey know everyone, and everyone likes them\u201d", MAV:"\u201cThey don't care what people think\u201d"}},
+    {q:"Choosing what to post when you have news", o:{EXP:"A breakdown of what you learned from it", ENT:"A funny or dramatic story about how it went", CON:"A shoutout to everyone who helped you get there", MAV:"Your honest, unfiltered take on it"}},
+    {q:"Someone challenges you publicly", o:{EXP:"Respond with facts and evidence", ENT:"Diffuse it with humor", CON:"Bring in others to back you up", MAV:"Push back hard, publicly"}},
+    {q:"Your ideal \u201cbrand\u201d one-liner", o:{EXP:"\u201cThe person who actually knows how this works\u201d", ENT:"\u201cThe person who makes this actually fun\u201d", CON:"\u201cThe person who connects the right people\u201d", MAV:"\u201cThe person who says what others won't\u201d"}},
+    {q:"Picking a niche or topic to be known for", o:{EXP:"The one you have the deepest expertise in", ENT:"Whatever lets your personality shine", CON:"Whatever brings the most interesting people together", MAV:"Whatever nobody else is covering honestly"}},
+    {q:"What makes you follow someone online", o:{EXP:"They consistently teach me something real", ENT:"They're genuinely entertaining", CON:"They introduce me to people or ideas I wouldn't find", MAV:"They say things other people are afraid to"}},
+    {q:"Your ideal collaboration", o:{EXP:"Co-writing something research-backed", ENT:"Making something fun together", CON:"Bringing two audiences or communities together", MAV:"Taking a bold stance together"}},
+    {q:"Handling being wrong publicly", o:{EXP:"Correct the record with the accurate info", ENT:"Own it with humor, laugh at yourself", CON:"Talk it through openly with your community", MAV:"Stand by your reasoning even if the take was rough"}},
+    {q:"Your bio or headline style", o:{EXP:"Credentials, results, what you've built", ENT:"Something personality-forward and memorable", CON:"Who you help and who you know", MAV:"A bold, opinionated one-liner"}},
+    {q:"What kind of content you enjoy making most", o:{EXP:"Deep dives and breakdowns", ENT:"Stories, skits, personality-driven stuff", CON:"Conversations and interviews", MAV:"Hot takes and unpopular opinions"}},
+    {q:"At a networking event", o:{EXP:"Talk shop, share what you're working on", ENT:"Work the room with energy and stories", CON:"Introduce people to each other", MAV:"Say the thing everyone's thinking but won't say"}},
+    {q:"Your ideal reputation in five years", o:{EXP:"The go-to expert in your field", ENT:"A recognizable, likable personality", CON:"The person everyone in the industry knows", MAV:"Someone who changed how people think about the topic"}},
+    {q:"Getting on stage to speak", o:{EXP:"Teach the audience something concrete", ENT:"Entertain them, keep the energy high", CON:"Make it feel like a conversation with the room", MAV:"Challenge what the audience believes"}},
+    {q:"Responding to a hot topic in your industry", o:{EXP:"Break down the facts calmly", ENT:"Make light of it, keep it fun", CON:"See what the community and other voices are saying", MAV:"Give your strongest, most direct opinion"}},
+    {q:"What you want your website homepage to say first", o:{EXP:"What you know and what you can prove", ENT:"Who you are and why people like you", CON:"Who you work with and who trusts you", MAV:"What you stand for"}},
+    {q:"A compliment that means the most", o:{EXP:"\u201cYou clearly know what you're talking about\u201d", ENT:"\u201cI love your energy\u201d", CON:"\u201cYou brought us all together\u201d", MAV:"\u201cYou're not afraid to be different\u201d"}},
+    {q:"How you build trust with an audience", o:{EXP:"By being consistently right and useful", ENT:"By being consistently real and relatable", CON:"By showing up for your community", MAV:"By being honest even when it's unpopular"}},
+    {q:"Your instinct when something you made goes viral", o:{EXP:"Use the attention to teach even more", ENT:"Ride the wave, keep it entertaining", CON:"Use it to bring people into your community", MAV:"Use it to say the bigger thing you actually believe"}},
+    {q:"Choosing a mentor or role model", o:{EXP:"Someone who's mastered their craft", ENT:"Someone magnetic people are drawn to", CON:"Someone with an incredible network", MAV:"Someone who broke the mold"}},
+    {q:"Your approach to a public speaking topic", o:{EXP:"Teach something people can use today", ENT:"Tell a story people will remember", CON:"Talk about the people who shaped you", MAV:"Argue for something unpopular"}},
+    {q:"Pitching yourself for a job or opportunity", o:{EXP:"Lead with results and proof of skill", ENT:"Lead with personality and how you'd fit the team", CON:"Lead with who you know and who'd vouch for you", MAV:"Lead with your unconventional point of view"}},
+    {q:"What kind of feedback stings the most", o:{EXP:"Being told you got something wrong", ENT:"Being told you're boring", CON:"Being left out of the group", MAV:"Being told you're \u201ctoo much\u201d"}},
+    {q:"Your favorite kind of content to consume", o:{EXP:"Explainers, breakdowns, deep research", ENT:"Comedy, stories, personality-driven content", CON:"Interviews, panels, roundtables", MAV:"Debate, hot takes, contrarian essays"}},
+    {q:"What you'd want said about your \u201cbrand,\u201d jokingly", o:{EXP:"\u201cActually knew what they were talking about\u201d", ENT:"\u201cMade it fun\u201d", CON:"\u201cBrought everyone together\u201d", MAV:"\u201cNever backed down\u201d"}},
+    {q:"How you use humor", o:{EXP:"Rarely — let the substance speak", ENT:"Constantly — it's core to how you show up", CON:"To make people comfortable in a group", MAV:"As a weapon to make a sharp point"}},
+    {q:"Your ideal role on a team or project", o:{EXP:"The one who knows the subject cold", ENT:"The one who keeps morale and energy up", CON:"The one who brings the right people together", MAV:"The one who pushes the group to think differently"}},
+    {q:"Talking about a personal win", o:{EXP:"Share what you learned that others could use", ENT:"Tell it like a fun story", CON:"Credit everyone who helped along the way", MAV:"Say it plainly, no false humility"}},
+    {q:"Your overall philosophy on building a brand", o:{EXP:"Be undeniably good at the thing", ENT:"Be someone people enjoy being around", CON:"Be someone worth knowing and trusting", MAV:"Be someone who says what's true, even if it's unpopular"}}
+  ];
+
+  const BRAND_DECK = BRAND_QUESTIONS.map((item, i) => ({
+    text: item.q,
+    options: seededOrder(i+101, BRAND_TYPES).map(t => ({type:t, text:item.o[t]}))
+  }));
+
+  const BRAND_ARCHETYPES = {
+    EXP: {name:"The Authority", sub:"Pure Expert", desc:"Your brand runs on credibility. People trust you because you're consistently right and consistently useful — depth is your calling card, not volume.", note:"<b>Watch for:</b> knowledge can stay invisible if it's never shared in a way people actually connect with."},
+    ENT: {name:"The Showman", sub:"Pure Entertainer", desc:"Your brand runs on personality. People stick around because you're genuinely fun to watch or listen to — energy and story are your edge.", note:"<b>Watch for:</b> charisma without substance fades fast. Give people something to remember beyond the moment."},
+    CON: {name:"The Networker", sub:"Pure Connector", desc:"Your brand runs on relationships. You're the person who knows everyone and makes everyone feel known — your value is who you bring together.", note:"<b>Watch for:</b> it's easy to become known for who you know instead of what you stand for."},
+    MAV: {name:"The Disruptor", sub:"Pure Maverick", desc:"Your brand runs on conviction. You say the thing others won't, and people follow because you're honest even when it costs you.", note:"<b>Watch for:</b> being contrarian for its own sake wears thin. Make sure the bold take is actually true."},
+    EXP_ENT: {name:"The Edutainer", sub:"Expert + Entertainer", desc:"You teach and you entertain at the same time — real substance delivered with real personality. People learn from you without realizing it feels like content, not homework.", note:"<b>Your edge:</b> genuinely sticky content. <b>Watch for:</b> don't let the jokes outrun the substance that earned the trust."},
+    EXP_CON: {name:"The Mentor", sub:"Expert + Connector", desc:"You lead with expertise, but you'd rather teach in a room than from a stage. Your brand is built on being the trusted node other people route through.", note:"<b>Your edge:</b> deep, durable trust. <b>Watch for:</b> your reach can stay smaller than your credibility deserves."},
+    EXP_MAV: {name:"The Myth-Buster", sub:"Expert + Maverick", desc:"You know the subject cold, and you use that credibility to challenge what everyone else assumes is true. People follow you because you're both right <em>and</em> willing to say it.", note:"<b>Your edge:</b> hard to argue with. <b>Watch for:</b> being right doesn't make the delivery land — tone still matters."},
+    ENT_CON: {name:"The Host", sub:"Entertainer + Connector", desc:"You bring the energy and you bring the room together — think less lecture, more dinner party. People show up because it's fun, and they stay because they feel like they belong.", note:"<b>Your edge:</b> people genuinely love being around you. <b>Watch for:</b> warmth alone doesn't build lasting authority — pair it with a clear point of view."},
+    ENT_MAV: {name:"The Provocateur", sub:"Entertainer + Maverick", desc:"You're funny, bold, and unafraid to poke the thing everyone's tiptoeing around. Your brand thrives on saying the sharp thing in a way people actually enjoy hearing.", note:"<b>Your edge:</b> impossible to ignore. <b>Watch for:</b> the line between provocative and just-for-shock-value is thinner than it feels."},
+    CON_MAV: {name:"The Movement Builder", sub:"Connector + Maverick", desc:"You rally people around a bold idea. You're not just making a point — you're building a tribe of people who believe it with you.", note:"<b>Your edge:</b> real influence, not just attention. <b>Watch for:</b> a movement built on opposition needs something to stand <em>for</em>, not just against."},
+    BAL: {name:"The Multi-Hyphenate", sub:"Evenly Balanced", desc:"No single lever dominates — you teach, entertain, connect, and speak your mind depending on what the moment calls for. Your brand is flexible rather than singular.", note:"<b>Your edge:</b> genuinely versatile. <b>Watch for:</b> without a clear lead trait, people may take longer to describe what you're \u201cknown for.\u201d"}
+  };
+
+  const BRAND_COMBO_KEYS = {
+    "EXP,ENT":"EXP_ENT", "ENT,EXP":"EXP_ENT",
+    "EXP,CON":"EXP_CON", "CON,EXP":"EXP_CON",
+    "EXP,MAV":"EXP_MAV", "MAV,EXP":"EXP_MAV",
+    "ENT,CON":"ENT_CON", "CON,ENT":"ENT_CON",
+    "ENT,MAV":"ENT_MAV", "MAV,ENT":"ENT_MAV",
+    "CON,MAV":"CON_MAV", "MAV,CON":"CON_MAV"
+  };
+
+  /* ---------------- STATE ---------------- */
+  const STORAGE_KEY = "taitypes_pase_progress_v1";
+  let answers = new Array(DECK.length).fill(null); // stores type letter chosen
+  let idx = 0;
+
+  function loadProgress(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        if(Array.isArray(parsed.answers) && parsed.answers.length === DECK.length){
+          answers = parsed.answers;
+          idx = Math.min(parsed.idx || 0, DECK.length-1);
+        }
+      }
+    }catch(e){}
+  }
+  function saveProgress(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({answers, idx})); }catch(e){}
+  }
+  function clearProgress(){
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  }
+
+  /* ---------------- BRAND STATE ---------------- */
+  const BRAND_STORAGE_KEY = "taitypes_brand_progress_v1";
+  let brandAnswers = new Array(BRAND_DECK.length).fill(null);
+  let brandIdx = 0;
+
+  function brandLoadProgress(){
+    try{
+      const raw = localStorage.getItem(BRAND_STORAGE_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        if(Array.isArray(parsed.answers) && parsed.answers.length === BRAND_DECK.length){
+          brandAnswers = parsed.answers;
+          brandIdx = Math.min(parsed.idx || 0, BRAND_DECK.length-1);
+        }
+      }
+    }catch(e){}
+  }
+  function brandSaveProgress(){
+    try{ localStorage.setItem(BRAND_STORAGE_KEY, JSON.stringify({answers:brandAnswers, idx:brandIdx})); }catch(e){}
+  }
+  function brandClearProgress(){
+    try{ localStorage.removeItem(BRAND_STORAGE_KEY); }catch(e){}
+  }
+
+  /* ---------------- SCREEN NAV ---------------- */
+  const screens = {
+    landing: document.getElementById('screen-landing'),
+    quiz: document.getElementById('screen-quiz'),
+    results: document.getElementById('screen-results'),
+    about: document.getElementById('screen-about'),
+    archetypes: document.getElementById('screen-archetypes'),
+    brandLanding: document.getElementById('screen-brand-landing'),
+    brandQuiz: document.getElementById('screen-brand-quiz'),
+    brandResults: document.getElementById('screen-brand-results'),
+    brandArchetypes: document.getElementById('screen-brand-archetypes')
+  };
+  const HEADER_TAGS = {
+    landing:"Quiz 01 · The PASE Compass", quiz:"Quiz 01 · The PASE Compass", results:"Quiz 01 · The PASE Compass",
+    about:"Guide · Understanding Results", archetypes:"Guide · PASE Archetypes",
+    brandLanding:"Quiz 02 · Personal Brand", brandQuiz:"Quiz 02 · Personal Brand", brandResults:"Quiz 02 · Personal Brand",
+    brandArchetypes:"Guide · Brand Archetypes"
+  };
+  const headerTagEl = document.getElementById('header-tag');
+  function showScreen(name){
+    Object.values(screens).forEach(s => s.classList.remove('active'));
+    screens[name].classList.add('active');
+    if(HEADER_TAGS[name]) headerTagEl.textContent = HEADER_TAGS[name];
+    window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
+  }
+
+  /* ---------------- COMPASS RENDERER ---------------- */
+  // angles computed from index: first type = top(-90deg), then clockwise
+  function angleFor(types, t){
+    const i = types.indexOf(t);
+    return -90 + i * (360/types.length);
+  }
+  function polar(cx, cy, r, deg){
+    const rad = deg * Math.PI/180;
+    return [cx + r*Math.cos(rad), cy + r*Math.sin(rad)];
+  }
+
+  function renderCompass(containerId, pctByType, opts){
+    opts = opts || {};
+    const size = opts.size || 220;
+    const cx = size/2, cy = size/2;
+    const maxR = size*0.36;
+    const container = document.getElementById(containerId);
+    const types = opts.types || TYPES;
+    const colors = opts.colors || TYPE_COLOR_HEX;
+    const fill = opts.fill || "rgba(194,78,94,0.22)";
+    const shortLabels = opts.shortLabels || {};
+
+    let rings = "";
+    [0.33,0.66,1].forEach(f=>{
+      rings += `<circle cx="${cx}" cy="${cy}" r="${maxR*f}" fill="none" stroke="var(--line)" stroke-width="1"/>`;
+    });
+
+    let axes = "", labels = "";
+    types.forEach(t=>{
+      const [x,y] = polar(cx,cy,maxR,angleFor(types,t));
+      axes += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--line)" stroke-width="1"/>`;
+      const [lx,ly] = polar(cx,cy,maxR+16,angleFor(types,t));
+      labels += `<circle cx="${lx}" cy="${ly}" r="11" fill="${colors[t]}"/>
+                 <text x="${lx}" y="${ly+4}" text-anchor="middle" font-size="10" font-weight="600" fill="#12151C">${shortLabels[t] || t}</text>`;
+    });
+
+    const points = types.map(t=>{
+      const pct = Math.max(pctByType[t]||0, 2);
+      const r = (pct/100) * maxR;
+      return polar(cx,cy,r,angleFor(types,t));
+    });
+    const poly = points.map(p=>p.join(",")).join(" ");
+
+    const svg = `
+      <svg class="compass" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+        ${rings}
+        ${axes}
+        <polygon points="${poly}" fill="${fill}" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round" style="transition: all 0.5s ease;"/>
+        ${points.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="var(--ink)"/>`).join("")}
+        ${labels}
+      </svg>`;
+    container.innerHTML = svg;
+  }
+
+  /* ---------------- QUIZ RENDER ---------------- */
+  const qCurrentEl = document.getElementById('q-current');
+  const qEyebrowEl = document.getElementById('q-eyebrow');
+  const qTextEl = document.getElementById('q-text');
+  const qOptionsEl = document.getElementById('q-options');
+  const barFillEl = document.getElementById('bar-fill');
+  const ringFillEl = document.getElementById('ring-fill');
+  const btnBack = document.getElementById('btn-back');
+  const btnNext = document.getElementById('btn-next');
+
+  const RING_CIRC = 2 * Math.PI * 19;
+
+  function currentScoresPct(uptoIndex){
+    // uptoIndex: how many answered so far (for live progress compass)
+    const counts = {P:0,A:0,S:0,E:0};
+    let total = 0;
+    for(let i=0;i<answers.length;i++){
+      if(answers[i]){ counts[answers[i]]++; total++; }
+    }
+    const pct = {};
+    TYPES.forEach(t=> pct[t] = total ? (counts[t]/total*100) : 0);
+    return pct;
+  }
+
+  function renderQuestion(){
+    const item = DECK[idx];
+    qCurrentEl.textContent = idx+1;
+    qEyebrowEl.textContent = "QUESTION " + String(idx+1).padStart(2,'0');
+    qTextEl.textContent = item.text;
+
+    qOptionsEl.innerHTML = "";
+    item.options.forEach(opt=>{
+      const btn = document.createElement('button');
+      btn.className = 'opt';
+      btn.type = 'button';
+      btn.innerHTML = `<span class="marker"></span><span>${opt.text}</span>`;
+      if(answers[idx] === opt.type) btn.classList.add('selected');
+      btn.addEventListener('click', ()=>{
+        answers[idx] = opt.type;
+        saveProgress();
+        [...qOptionsEl.children].forEach(c=>c.classList.remove('selected'));
+        btn.classList.add('selected');
+        btnNext.disabled = false;
+        updateProgressUI();
+      });
+      qOptionsEl.appendChild(btn);
+    });
+
+    btnNext.disabled = !answers[idx];
+    btnNext.textContent = (idx === DECK.length-1) ? "See results →" : "Next →";
+    btnBack.style.visibility = idx === 0 ? 'hidden' : 'visible';
+    updateProgressUI();
+  }
+
+  function updateProgressUI(){
+    const answeredCount = answers.filter(Boolean).length;
+    const frac = (idx) / DECK.length;
+    barFillEl.style.width = (frac*100) + "%";
+    const ringFrac = answeredCount / DECK.length;
+    ringFillEl.style.strokeDasharray = RING_CIRC;
+    ringFillEl.style.strokeDashoffset = RING_CIRC * (1 - ringFrac);
+  }
+
+  document.getElementById('btn-next').addEventListener('click', ()=>{
+    if(!answers[idx]) return;
+    if(idx === DECK.length-1){
+      finishQuiz();
+      return;
+    }
+    idx++;
+    saveProgress();
+    renderQuestion();
+  });
+  document.getElementById('btn-back').addEventListener('click', ()=>{
+    if(idx===0) return;
+    idx--;
+    saveProgress();
+    renderQuestion();
+  });
+
+  document.getElementById('btn-start').addEventListener('click', ()=>{
+    showScreen('quiz');
+    renderQuestion();
+  });
+
+  /* ---------------- RESULTS ---------------- */
+  function computeResults(){
+    const counts = {P:0,A:0,S:0,E:0};
+    answers.forEach(a=>{ if(a) counts[a]++; });
+    const total = DECK.length;
+    const pct = {};
+    TYPES.forEach(t=> pct[t] = Math.round(counts[t]/total*100));
+    const ranked = TYPES.slice().sort((a,b)=> counts[b]-counts[a] || TYPES.indexOf(a)-TYPES.indexOf(b));
+    return {counts, pct, ranked, total};
+  }
+
+  function pickArchetype(res){
+    const {counts, ranked} = res;
+    const top1 = ranked[0], top2 = ranked[1];
+    const c1 = counts[top1], c2 = counts[top2];
+    const cLast = counts[ranked[3]];
+    const spread = c1 - cLast;
+
+    // balanced: everything within a tight band
+    if(spread <= 4){
+      return ARCHETYPES.BAL;
+    }
+    // pure dominant
+    if(c1 >= 15 && (c1-c2) >= 6){
+      return ARCHETYPES[top1];
+    }
+    // combo of top two
+    const key = COMBO_KEYS[top1+","+top2];
+    return ARCHETYPES[key];
+  }
+
+  function finishQuiz(){
+    const res = computeResults();
+    const arch = pickArchetype(res);
+
+    document.getElementById('res-archetype').textContent = arch.name;
+    document.getElementById('res-archetype-sub').innerHTML = arch.sub + " &nbsp;·&nbsp; primary lean: <b>" + TYPE_NAME[res.ranked[0]] + "</b>";
+    document.getElementById('res-desc').innerHTML = arch.desc;
+    document.getElementById('res-note').innerHTML = arch.note;
+
+    renderCompass('results-compass', res.pct, {size:240});
+
+    // stat list, ranked
+    const statList = document.getElementById('stat-list');
+    statList.innerHTML = "";
+    res.ranked.forEach((t, i)=>{
+      const row = document.createElement('div');
+      row.className = 'stat-row';
+      row.innerHTML = `
+        <div class="stat-rank">#${i+1}</div>
+        <div class="stat-label"><span class="dot ${t}" style="width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#12151C;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;background:${TYPE_COLOR_HEX[t]};">${t}</span>${TYPE_NAME[t]}</div>
+        <div class="stat-track"><div class="stat-fill ${t}" style="width:0%;"></div></div>
+        <div class="stat-pct">${res.pct[t]}%</div>
+      `;
+      statList.appendChild(row);
+      requestAnimationFrame(()=>{
+        setTimeout(()=>{ row.querySelector('.stat-fill').style.width = res.pct[t] + "%"; }, 50);
+      });
+    });
+
+    // combo grid: raw counts
+    const comboGrid = document.getElementById('combo-grid');
+    comboGrid.innerHTML = "";
+    TYPES.forEach(t=>{
+      const card = document.createElement('div');
+      card.className = 'combo-card';
+      card.innerHTML = `<div class="val" style="color:${TYPE_COLOR_HEX[t]}">${res.counts[t]}/30</div><div class="lab">${TYPE_NAME[t]} answers</div>`;
+      comboGrid.appendChild(card);
+    });
+
+    window._lastResults = res;
+    window._lastArchetype = arch;
+
+    showScreen('results');
+  }
+
+  document.getElementById('btn-retake').addEventListener('click', ()=>{
+    answers = new Array(DECK.length).fill(null);
+    idx = 0;
+    clearProgress();
+    showScreen('landing');
+  });
+
+  document.getElementById('btn-share').addEventListener('click', ()=>{
+    const res = window._lastResults;
+    const arch = window._lastArchetype;
+    if(!res) return;
+    const text = `My PASE result on TaiTypes: ${arch.name} (${arch.sub})\n` +
+      TYPES.map(t=>`${TYPE_NAME[t]}: ${res.pct[t]}%`).join(" · ");
+    const btn = document.getElementById('btn-share');
+    const original = btn.textContent;
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(text).then(()=>{
+        btn.textContent = "Copied ✓";
+        setTimeout(()=> btn.textContent = original, 1600);
+      }).catch(()=>{
+        btn.textContent = "Couldn't copy";
+        setTimeout(()=> btn.textContent = original, 1600);
+      });
+    }
+  });
+
+  /* ---------------- BRAND QUIZ RENDER ---------------- */
+  const brandQCurrentEl = document.getElementById('brand-q-current');
+  const brandQEyebrowEl = document.getElementById('brand-q-eyebrow');
+  const brandQTextEl = document.getElementById('brand-q-text');
+  const brandQOptionsEl = document.getElementById('brand-q-options');
+  const brandBarFillEl = document.getElementById('brand-bar-fill');
+  const brandRingFillEl = document.getElementById('brand-ring-fill');
+  const brandBtnBack = document.getElementById('brand-btn-back');
+  const brandBtnNext = document.getElementById('brand-btn-next');
+
+  function renderBrandQuestion(){
+    const item = BRAND_DECK[brandIdx];
+    brandQCurrentEl.textContent = brandIdx+1;
+    brandQEyebrowEl.textContent = "QUESTION " + String(brandIdx+1).padStart(2,'0');
+    brandQTextEl.textContent = item.text;
+
+    brandQOptionsEl.innerHTML = "";
+    item.options.forEach(opt=>{
+      const btn = document.createElement('button');
+      btn.className = 'opt';
+      btn.type = 'button';
+      btn.innerHTML = `<span class="marker"></span><span>${opt.text}</span>`;
+      if(brandAnswers[brandIdx] === opt.type) btn.classList.add('selected');
+      btn.addEventListener('click', ()=>{
+        brandAnswers[brandIdx] = opt.type;
+        brandSaveProgress();
+        [...brandQOptionsEl.children].forEach(c=>c.classList.remove('selected'));
+        btn.classList.add('selected');
+        brandBtnNext.disabled = false;
+        updateBrandProgressUI();
+      });
+      brandQOptionsEl.appendChild(btn);
+    });
+
+    brandBtnNext.disabled = !brandAnswers[brandIdx];
+    brandBtnNext.textContent = (brandIdx === BRAND_DECK.length-1) ? "See results →" : "Next →";
+    brandBtnBack.style.visibility = brandIdx === 0 ? 'hidden' : 'visible';
+    updateBrandProgressUI();
+  }
+
+  function updateBrandProgressUI(){
+    const answeredCount = brandAnswers.filter(Boolean).length;
+    const frac = (brandIdx) / BRAND_DECK.length;
+    brandBarFillEl.style.width = (frac*100) + "%";
+    const ringFrac = answeredCount / BRAND_DECK.length;
+    brandRingFillEl.style.strokeDasharray = RING_CIRC;
+    brandRingFillEl.style.strokeDashoffset = RING_CIRC * (1 - ringFrac);
+  }
+
+  brandBtnNext.addEventListener('click', ()=>{
+    if(!brandAnswers[brandIdx]) return;
+    if(brandIdx === BRAND_DECK.length-1){
+      finishBrandQuiz();
+      return;
+    }
+    brandIdx++;
+    brandSaveProgress();
+    renderBrandQuestion();
+  });
+  brandBtnBack.addEventListener('click', ()=>{
+    if(brandIdx===0) return;
+    brandIdx--;
+    brandSaveProgress();
+    renderBrandQuestion();
+  });
+
+  document.getElementById('btn-brand-start').addEventListener('click', ()=>{
+    showScreen('brandQuiz');
+    renderBrandQuestion();
+  });
+
+  /* ---------------- BRAND RESULTS ---------------- */
+  function computeBrandResults(){
+    const counts = {EXP:0,ENT:0,CON:0,MAV:0};
+    brandAnswers.forEach(a=>{ if(a) counts[a]++; });
+    const total = BRAND_DECK.length;
+    const pct = {};
+    BRAND_TYPES.forEach(t=> pct[t] = Math.round(counts[t]/total*100));
+    const ranked = BRAND_TYPES.slice().sort((a,b)=> counts[b]-counts[a] || BRAND_TYPES.indexOf(a)-BRAND_TYPES.indexOf(b));
+    return {counts, pct, ranked, total};
+  }
+
+  function pickBrandArchetype(res){
+    const {counts, ranked} = res;
+    const top1 = ranked[0], top2 = ranked[1];
+    const c1 = counts[top1], c2 = counts[top2];
+    const cLast = counts[ranked[3]];
+    const spread = c1 - cLast;
+
+    if(spread <= 4){
+      return BRAND_ARCHETYPES.BAL;
+    }
+    if(c1 >= 15 && (c1-c2) >= 6){
+      return BRAND_ARCHETYPES[top1];
+    }
+    const key = BRAND_COMBO_KEYS[top1+","+top2];
+    return BRAND_ARCHETYPES[key];
+  }
+
+  function finishBrandQuiz(){
+    const res = computeBrandResults();
+    const arch = pickBrandArchetype(res);
+
+    document.getElementById('brand-res-archetype').textContent = arch.name;
+    document.getElementById('brand-res-archetype-sub').innerHTML = arch.sub + " &nbsp;·&nbsp; primary lean: <b>" + BRAND_TYPE_NAME[res.ranked[0]] + "</b>";
+    document.getElementById('brand-res-desc').innerHTML = arch.desc;
+    document.getElementById('brand-res-note').innerHTML = arch.note;
+
+    renderCompass('brand-results-compass', res.pct, {size:240, types:BRAND_TYPES, colors:BRAND_TYPE_COLOR_HEX, shortLabels:BRAND_SHORT_LABELS, fill:"rgba(124,155,214,0.22)"});
+
+    const statList = document.getElementById('brand-stat-list');
+    statList.innerHTML = "";
+    res.ranked.forEach((t, i)=>{
+      const row = document.createElement('div');
+      row.className = 'stat-row';
+      row.innerHTML = `
+        <div class="stat-rank">#${i+1}</div>
+        <div class="stat-label"><span style="width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#12151C;font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:600;background:${BRAND_TYPE_COLOR_HEX[t]};">${BRAND_SHORT_LABELS[t]}</span>${BRAND_TYPE_NAME[t]}</div>
+        <div class="stat-track"><div class="stat-fill" style="width:0%; background:${BRAND_TYPE_COLOR_HEX[t]};"></div></div>
+        <div class="stat-pct">${res.pct[t]}%</div>
+      `;
+      statList.appendChild(row);
+      requestAnimationFrame(()=>{
+        setTimeout(()=>{ row.querySelector('.stat-fill').style.width = res.pct[t] + "%"; }, 50);
+      });
+    });
+
+    const comboGrid = document.getElementById('brand-combo-grid');
+    comboGrid.innerHTML = "";
+    BRAND_TYPES.forEach(t=>{
+      const card = document.createElement('div');
+      card.className = 'combo-card';
+      card.innerHTML = `<div class="val" style="color:${BRAND_TYPE_COLOR_HEX[t]}">${res.counts[t]}/30</div><div class="lab">${BRAND_TYPE_NAME[t]} answers</div>`;
+      comboGrid.appendChild(card);
+    });
+
+    window._lastBrandResults = res;
+    window._lastBrandArchetype = arch;
+
+    showScreen('brandResults');
+  }
+
+  document.getElementById('brand-btn-retake').addEventListener('click', ()=>{
+    brandAnswers = new Array(BRAND_DECK.length).fill(null);
+    brandIdx = 0;
+    brandClearProgress();
+    showScreen('brandLanding');
+  });
+
+  document.getElementById('brand-btn-share').addEventListener('click', ()=>{
+    const res = window._lastBrandResults;
+    const arch = window._lastBrandArchetype;
+    if(!res) return;
+    const text = `My Personal Brand result on TaiTypes: ${arch.name} (${arch.sub})\n` +
+      BRAND_TYPES.map(t=>`${BRAND_TYPE_NAME[t]}: ${res.pct[t]}%`).join(" · ");
+    const btn = document.getElementById('brand-btn-share');
+    const original = btn.textContent;
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(text).then(()=>{
+        btn.textContent = "Copied ✓";
+        setTimeout(()=> btn.textContent = original, 1600);
+      }).catch(()=>{
+        btn.textContent = "Couldn't copy";
+        setTimeout(()=> btn.textContent = original, 1600);
+      });
+    }
+  });
+
+  document.getElementById('btn-goto-brand').addEventListener('click', ()=> showScreen('brandLanding'));
+  document.getElementById('btn-goto-pase').addEventListener('click', ()=> showScreen('landing'));
+
+  /* ---------------- ABOUT / ARCHETYPES PAGES ---------------- */
+  const ARCHETYPE_ORDER = [
+    {key:"P", letters:["P"]}, {key:"A", letters:["A"]}, {key:"S", letters:["S"]}, {key:"E", letters:["E"]},
+    {key:"PA", letters:["P","A"]}, {key:"PS", letters:["P","S"]}, {key:"PE", letters:["P","E"]},
+    {key:"AS", letters:["A","S"]}, {key:"AE", letters:["A","E"]}, {key:"SE", letters:["S","E"]},
+    {key:"BAL", letters:["P","A","S","E"]}
+  ];
+
+  function badgeStyle(letters){
+    if(letters.length === 1) return `background:${TYPE_COLOR_HEX[letters[0]]};`;
+    if(letters.length === 4) return `background:linear-gradient(135deg, ${TYPE_COLOR_HEX.P}, ${TYPE_COLOR_HEX.A}, ${TYPE_COLOR_HEX.S}, ${TYPE_COLOR_HEX.E});`;
+    return `background:linear-gradient(135deg, ${TYPE_COLOR_HEX[letters[0]]}, ${TYPE_COLOR_HEX[letters[1]]});`;
+  }
+
+  function renderArchetypeList(){
+    const list = document.getElementById('archetype-list');
+    list.innerHTML = "";
+    ARCHETYPE_ORDER.forEach(entry=>{
+      const arch = ARCHETYPES[entry.key];
+      if(!arch) return;
+      const card = document.createElement('div');
+      card.className = 'archetype-card';
+      card.innerHTML = `
+        <div class="badge" style="${badgeStyle(entry.letters)}">${entry.letters.length===4 ? '◆' : entry.letters.join('+')}</div>
+        <div>
+          <h3>${arch.name}</h3>
+          <div class="arche-sub">${arch.sub}</div>
+          <p>${arch.desc}</p>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+  }
+  renderArchetypeList();
+
+  document.getElementById('about-back').addEventListener('click', ()=> showScreen('landing'));
+  document.getElementById('archetypes-back').addEventListener('click', ()=> showScreen('landing'));
+  document.getElementById('about-see-archetypes').addEventListener('click', ()=> showScreen('archetypes'));
+
+  const BRAND_ARCHETYPE_ORDER = [
+    {key:"EXP", letters:["EXP"]}, {key:"ENT", letters:["ENT"]}, {key:"CON", letters:["CON"]}, {key:"MAV", letters:["MAV"]},
+    {key:"EXP_ENT", letters:["EXP","ENT"]}, {key:"EXP_CON", letters:["EXP","CON"]}, {key:"EXP_MAV", letters:["EXP","MAV"]},
+    {key:"ENT_CON", letters:["ENT","CON"]}, {key:"ENT_MAV", letters:["ENT","MAV"]}, {key:"CON_MAV", letters:["CON","MAV"]},
+    {key:"BAL", letters:["EXP","ENT","CON","MAV"]}
+  ];
+
+  function brandBadgeStyle(letters){
+    if(letters.length === 1) return `background:${BRAND_TYPE_COLOR_HEX[letters[0]]};`;
+    if(letters.length === 4) return `background:linear-gradient(135deg, ${BRAND_TYPE_COLOR_HEX.EXP}, ${BRAND_TYPE_COLOR_HEX.ENT}, ${BRAND_TYPE_COLOR_HEX.CON}, ${BRAND_TYPE_COLOR_HEX.MAV});`;
+    return `background:linear-gradient(135deg, ${BRAND_TYPE_COLOR_HEX[letters[0]]}, ${BRAND_TYPE_COLOR_HEX[letters[1]]});`;
+  }
+
+  function renderBrandArchetypeList(){
+    const list = document.getElementById('brand-archetype-list');
+    list.innerHTML = "";
+    BRAND_ARCHETYPE_ORDER.forEach(entry=>{
+      const arch = BRAND_ARCHETYPES[entry.key];
+      if(!arch) return;
+      const card = document.createElement('div');
+      card.className = 'archetype-card';
+      const badgeText = entry.letters.length===4 ? '◆' : entry.letters.map(l=>BRAND_SHORT_LABELS[l]).join('+');
+      card.innerHTML = `
+        <div class="badge" style="${brandBadgeStyle(entry.letters)}">${badgeText}</div>
+        <div>
+          <h3>${arch.name}</h3>
+          <div class="arche-sub">${arch.sub}</div>
+          <p>${arch.desc}</p>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+  }
+  renderBrandArchetypeList();
+
+  document.getElementById('brand-archetypes-back').addEventListener('click', ()=> showScreen('brandLanding'));
+
+  /* ---------------- SIDEBAR ---------------- */
+  const sidebar = document.getElementById('sidebar');
+  const sidebarOverlay = document.getElementById('sidebar-overlay');
+  const menuBtn = document.getElementById('menu-btn');
+  const sidebarClose = document.getElementById('sidebar-close');
+
+  function openSidebar(){
+    sidebar.classList.add('open');
+    sidebarOverlay.classList.add('open');
+  }
+  function closeSidebar(){
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('open');
+  }
+  menuBtn.addEventListener('click', openSidebar);
+  sidebarClose.addEventListener('click', closeSidebar);
+  sidebarOverlay.addEventListener('click', closeSidebar);
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape') closeSidebar();
+  });
+  document.getElementById('sidebar-item-pase').addEventListener('click', ()=>{
+    closeSidebar();
+    showScreen('landing');
+  });
+  document.getElementById('sidebar-item-brand').addEventListener('click', ()=>{
+    closeSidebar();
+    showScreen('brandLanding');
+  });
+  document.getElementById('sidebar-item-about').addEventListener('click', ()=>{
+    closeSidebar();
+    showScreen('about');
+  });
+  document.getElementById('sidebar-item-archetypes').addEventListener('click', ()=>{
+    closeSidebar();
+    showScreen('archetypes');
+  });
+  document.getElementById('sidebar-item-brand-archetypes').addEventListener('click', ()=>{
+    closeSidebar();
+    showScreen('brandArchetypes');
+  });
+
+  /* ---------------- INIT ---------------- */
+  loadProgress();
+  brandLoadProgress();
+  renderCompass('landing-compass', {P:25,A:25,S:25,E:25}, {size:180});
+  renderCompass('brand-landing-compass', {EXP:25,ENT:25,CON:25,MAV:25}, {size:180, types:BRAND_TYPES, colors:BRAND_TYPE_COLOR_HEX, shortLabels:BRAND_SHORT_LABELS, fill:"rgba(124,155,214,0.22)"});
+
+})();
+</script>
+</body>
+</html>
